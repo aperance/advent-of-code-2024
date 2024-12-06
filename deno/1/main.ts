@@ -1,4 +1,4 @@
-const raw = await Deno.readTextFile("../../inputs/1/full.txt");
+const raw = await Deno.readTextFile(Deno.args[0]);
 
 const arr1: number[] = [];
 const arr2: number[] = [];
@@ -17,8 +17,12 @@ for (const row of raw.split(/\n/)) {
 arr1.sort((a, b) => a - b);
 arr2.sort((a, b) => a - b);
 
-const diff = arr1.map((val1, i) => Math.abs(val1 - arr2[i]));
-const sum = diff.reduce((arr, val) => arr + val, 0);
+let distance = 0, similarity = 0;
 
-console.log({ arr1, arr2, diff });
-console.log("Final Result:", sum);
+for (let i = 0; i < arr1.length; i++) {
+  distance += Math.abs(arr1[i] - arr2[i]);
+  similarity += arr1[i] * arr2.filter((val) => val === arr1[i]).length;
+}
+
+console.log("Total distance:", distance);
+console.log("Similarity score:", similarity);

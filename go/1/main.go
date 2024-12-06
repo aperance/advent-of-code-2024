@@ -11,7 +11,7 @@ import (
 )
 
 func main() {
-	file, err := os.Open("../../inputs/1/full.txt")
+	file, err := os.Open(os.Args[1])
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -38,16 +38,24 @@ func main() {
 	sort.Ints(arr[0])
 	sort.Ints(arr[1])
 
-	sum := 0
+	distance, similarity := 0, 0
 
 	for i, v0 := range arr[0] {
-		v1 := arr[1][i]
-		if v0 < v1 {
-			sum += v1 - v0
-		} else {
-			sum += v0 - v1
+		for j, v1 := range arr[1] {
+			if i == j {
+				if v0 < v1 {
+					distance += v1 - v0
+				} else {
+					distance += v0 - v1
+				}
+			}
+
+			if v0 == v1 {
+				similarity += v1
+			}
 		}
 	}
 
-	fmt.Println("Result:", sum)
+	fmt.Println("Total distance:", distance)
+	fmt.Println("Similarity score:", similarity)
 }
