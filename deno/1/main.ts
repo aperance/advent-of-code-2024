@@ -1,10 +1,10 @@
-const raw = await Deno.readTextFile(Deno.args[0]);
+import { stdin } from "../lib/stdin.ts";
 
 const arr1: number[] = [];
 const arr2: number[] = [];
 
-for (const row of raw.split(/\n/)) {
-  const vals = row.split(/\s+/);
+for await (const line of stdin) {
+  const vals = line.split(/\s+/);
 
   if (vals.length !== 2) {
     throw Error("Row parsing error");

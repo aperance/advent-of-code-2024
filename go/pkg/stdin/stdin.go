@@ -13,7 +13,7 @@ func GetScanner() *bufio.Scanner {
 	}
 
 	if info.Mode()&os.ModeCharDevice != 0 {
-		log.Fatal("No data provided via stdin")
+		log.Fatal("Input data must be piped in via stdin")
 	}
 
 	return bufio.NewScanner(os.Stdin)
