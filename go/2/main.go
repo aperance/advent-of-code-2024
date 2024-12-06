@@ -1,13 +1,13 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
 	"log"
 	"math"
-	"os"
 	"strconv"
 	"strings"
+
+	"github.com/aperance/advent-of-code-2024/go/pkg/stdin"
 )
 
 func removeIndex(s []string, index int) []string {
@@ -46,13 +46,8 @@ func checkReport(row []string) (bool, int) {
 }
 
 func main() {
-	file, err := os.Open(os.Args[1])
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer file.Close()
+	scanner := stdin.GetScanner()
 
-	scanner := bufio.NewScanner(file)
 	safeReports := 0
 	dampenedReports := 0
 

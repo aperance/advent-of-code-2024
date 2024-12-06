@@ -1,23 +1,18 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
 	"log"
-	"os"
 	"sort"
 	"strconv"
 	"strings"
+
+	"github.com/aperance/advent-of-code-2024/go/pkg/stdin"
 )
 
 func main() {
-	file, err := os.Open(os.Args[1])
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer file.Close()
+	scanner := stdin.GetScanner()
 
-	scanner := bufio.NewScanner(file)
 	arr := make([][]int, 2)
 
 	for scanner.Scan() {
