@@ -1,9 +1,9 @@
-import { stdin } from "../lib/stdin.ts";
+import { getInputStream } from "../lib/stdin.ts";
 
 const arr1: number[] = [];
 const arr2: number[] = [];
 
-for await (const line of stdin) {
+for await (const line of getInputStream()) {
   const vals = line.split(/\s+/);
 
   if (vals.length !== 2) {
