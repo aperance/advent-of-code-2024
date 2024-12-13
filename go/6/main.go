@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"slices"
+	"sync"
+	"time"
 
 	"github.com/aperance/advent-of-code-2024/go/pkg/stdin"
 )
@@ -14,7 +16,7 @@ type visitedMap struct {
 // Sets visited position and current vector in map.
 // Returns true if value is unchanged, false otherwise
 func (v *visitedMap) set(position [2]int, data [2]int) bool {
-	id := string(position[0]) + ":" + string(position[1])
+	id := string(rune(position[0])) + ":" + string(rune(position[1]))
 	previousData := v._map[id]
 	if slices.Contains(previousData, data) {
 		return true
@@ -30,7 +32,6 @@ func (v *visitedMap) count() int {
 type lab struct {
 	field         [][]bool
 	guardPosition [2]int
-	extraObstacle [2]int
 }
 
 func (l *lab) loadData() {
@@ -58,16 +59,14 @@ func (l *lab) loadData() {
 
 // Processes the guard movements. Returns a count of distinct
 // positions visited and if the guard is stuck in a loop.
-func (l lab) runGuard() (int, bool) {
+func (l lab) runGuard(extraObstacle [2]int) (int, bool) {
 	vectors := [4][2]int{{-1, 0}, {0, 1}, {1, 0}, {0, -1}}
 	visited := visitedMap{_map: make(map[string][][2]int)}
 
 	for {
 		for _, vec := range vectors {
 			for {
-				// fmt.Println(l.guardPosition, vec)
 				unchanged := visited.set(l.guardPosition, vec)
-				// fmt.Println(unchanged)
 				if unchanged {
 					return visited.count(), true
 				}
@@ -79,7 +78,7 @@ func (l lab) runGuard() (int, bool) {
 					return visited.count(), false
 				}
 
-				blocked := l.field[next[0]][next[1]] || next == l.extraObstacle
+				blocked := l.field[next[0]][next[1]] || next == extraObstacle
 				if blocked {
 					break
 				}
@@ -91,27 +90,53 @@ func (l lab) runGuard() (int, bool) {
 }
 
 func newLab() lab {
-	l := lab{extraObstacle: [2]int{-1, -1}}
+	l := lab{}
 	l.loadData()
 	return l
 }
 
+type stuckCount struct {
+	mu    sync.Mutex
+	count int
+}
+
+func (s *stuckCount) increment() {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	s.count++
+}
+
 func main() {
+	start := time.Now()
+
 	lab := newLab()
-	count, _ := lab.runGuard()
+	count, _ := lab.runGuard([2]int{-1, -1})
 
 	fmt.Println("Distinct positions:", count)
 
-	stuckCount := 0
+	var wg sync.WaitGroup
+	stuckCount := stuckCount{}
+
 	for i, row := range lab.field {
 		for j := range row {
-			lab.extraObstacle = [2]int{i, j}
-			_, stuck := lab.runGuard()
-			if stuck {
-				stuckCount++
-			}
+			wg.Add(1)
+
+			go func() {
+				defer wg.Done()
+
+				_, stuck := lab.runGuard([2]int{i, j})
+				if stuck {
+					stuckCount.increment()
+				}
+			}()
 		}
 	}
 
-	fmt.Println("Extra obstacles causing guard to be stuck:", stuckCount)
+	wg.Wait()
+
+	fmt.Println("Extra obstacles causing guard to be stuck:", stuckCount.count)
+
+	elapsed := time.Since(start)
+	fmt.Println("Elapsed time:", elapsed)
 }
