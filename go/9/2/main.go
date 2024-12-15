@@ -6,7 +6,7 @@ import (
 	"log"
 	"strconv"
 
-	"github.com/aperance/advent-of-code-2024/go/pkg/stdin"
+	"github.com/aperance/advent-of-code-2024/go/pkg/utils"
 )
 
 func appendMultiple(slice []string, count int, elems ...string) []string {
@@ -58,7 +58,7 @@ func (f *file) toArray() []string {
 }
 
 func main() {
-	scanner := stdin.GetScanner()
+	scanner := utils.GetScanner()
 	scanner.Split(bufio.ScanRunes)
 
 	fileID := 0

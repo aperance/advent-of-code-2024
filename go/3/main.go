@@ -6,12 +6,12 @@ import (
 	"regexp"
 	"strconv"
 
-	"github.com/aperance/advent-of-code-2024/go/pkg/stdin"
+	"github.com/aperance/advent-of-code-2024/go/pkg/utils"
 )
 
 func main() {
 	re := regexp.MustCompile(`(do|don't)\(\)|mul\((\d+),(\d+)\)`)
-	scanner := stdin.GetScanner()
+	scanner := utils.GetScanner()
 	enabled := true
 	sum := 0
 

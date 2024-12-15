@@ -7,11 +7,11 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/aperance/advent-of-code-2024/go/pkg/stdin"
+	"github.com/aperance/advent-of-code-2024/go/pkg/utils"
 )
 
 func main() {
-	scanner := stdin.GetScanner()
+	scanner := utils.GetScanner()
 
 	arr := make([][]int, 2)
 

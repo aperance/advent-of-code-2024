@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/aperance/advent-of-code-2024/go/pkg/stdin"
+	"github.com/aperance/advent-of-code-2024/go/pkg/utils"
 )
 
 const width = 101
@@ -88,7 +88,7 @@ func filledGrid() [height][width]string {
 }
 
 func main() {
-	scanner := stdin.GetScanner()
+	scanner := utils.GetScanner()
 	var bots []robot
 	for scanner.Scan() {
 		pos, vec := parseInput(scanner.Text())

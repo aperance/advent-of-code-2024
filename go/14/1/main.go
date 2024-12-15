@@ -5,9 +5,8 @@ import (
 	"log"
 	"strconv"
 	"strings"
-	"time"
 
-	"github.com/aperance/advent-of-code-2024/go/pkg/stdin"
+	"github.com/aperance/advent-of-code-2024/go/pkg/utils"
 )
 
 const width = 101
@@ -77,12 +76,13 @@ func parseInput(input string) ([]int, []int) {
 }
 
 func main() {
-	start := time.Now()
+	t := utils.StartTimer()
+	defer t.PrintDuration()
 
 	quadCounts := [4]int{}
 	safetyFactor := 1
 
-	scanner := stdin.GetScanner()
+	scanner := utils.GetScanner()
 	for scanner.Scan() {
 		pos, vec := parseInput(scanner.Text())
 		bot := robot{xPos: pos[0], yPos: pos[1], xVec: vec[0], yVec: vec[1]}
@@ -98,7 +98,4 @@ func main() {
 	}
 
 	fmt.Println("Safety factor:", safetyFactor)
-
-	elapsed := time.Since(start)
-	fmt.Println("Elapsed time:", elapsed)
 }

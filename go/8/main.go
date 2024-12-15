@@ -3,14 +3,14 @@ package main
 import (
 	"fmt"
 
-	"github.com/aperance/advent-of-code-2024/go/pkg/stdin"
+	"github.com/aperance/advent-of-code-2024/go/pkg/utils"
 )
 
 func getInput() (map[rune][][2]int, int, int) {
 	antennaMap := make(map[rune][][2]int)
 	width := 0
 
-	scanner := stdin.GetScanner()
+	scanner := utils.GetScanner()
 	rowIndex := 0
 	for scanner.Scan() {
 		row := scanner.Text()
@@ -44,7 +44,7 @@ func (a *antinodes) findAntinodes(start [2]int, step [2]int, direction int, max 
 		if new0 < 0 || new0 > max[0] || new1 < 0 || new1 > max[1] {
 			break
 		}
-		id := string(new0) + ":" + string(new1)
+		id := string(rune(new0)) + ":" + string(rune(new1))
 		a.harmonicSet[id] = struct{}{}
 		if i == 1 {
 			a.initialSet[id] = struct{}{}

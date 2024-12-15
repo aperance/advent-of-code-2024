@@ -4,9 +4,8 @@ import (
 	"fmt"
 	"slices"
 	"sync"
-	"time"
 
-	"github.com/aperance/advent-of-code-2024/go/pkg/stdin"
+	"github.com/aperance/advent-of-code-2024/go/pkg/utils"
 )
 
 type visitedMap struct {
@@ -35,7 +34,7 @@ type lab struct {
 }
 
 func (l *lab) loadData() {
-	scanner := stdin.GetScanner()
+	scanner := utils.GetScanner()
 	rowIndex := 0
 	for scanner.Scan() {
 		bytes := scanner.Bytes()
@@ -108,7 +107,8 @@ func (s *stuckCount) increment() {
 }
 
 func main() {
-	start := time.Now()
+	t := utils.StartTimer()
+	defer t.PrintDuration()
 
 	lab := newLab()
 	count, _ := lab.runGuard([2]int{-1, -1})
@@ -136,7 +136,4 @@ func main() {
 	wg.Wait()
 
 	fmt.Println("Extra obstacles causing guard to be stuck:", stuckCount.count)
-
-	elapsed := time.Since(start)
-	fmt.Println("Elapsed time:", elapsed)
 }

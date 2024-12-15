@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/aperance/advent-of-code-2024/go/pkg/stdin"
+	"github.com/aperance/advent-of-code-2024/go/pkg/utils"
 )
 
 func removeIndex(s []string, index int) []string {
@@ -46,7 +46,7 @@ func checkReport(row []string) (bool, int) {
 }
 
 func main() {
-	scanner := stdin.GetScanner()
+	scanner := utils.GetScanner()
 
 	safeReports := 0
 	dampenedReports := 0

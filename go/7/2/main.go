@@ -5,9 +5,8 @@ import (
 	"log"
 	"strconv"
 	"strings"
-	"time"
 
-	"github.com/aperance/advent-of-code-2024/go/pkg/stdin"
+	"github.com/aperance/advent-of-code-2024/go/pkg/utils"
 )
 
 func checkEquation(operands []int, operations []int, expectedResult int) bool {
@@ -43,11 +42,12 @@ func checkEquation(operands []int, operations []int, expectedResult int) bool {
 }
 
 func main() {
-	start := time.Now()
+	t := utils.StartTimer()
+	defer t.PrintDuration()
 
 	sum := 0
 
-	scanner := stdin.GetScanner()
+	scanner := utils.GetScanner()
 	for scanner.Scan() {
 		row := strings.Split(scanner.Text(), ": ")
 
@@ -72,7 +72,4 @@ func main() {
 	}
 
 	fmt.Println("Sum of matching equations:", sum)
-
-	elapsed := time.Since(start)
-	fmt.Println("Elapsed time:", elapsed)
 }

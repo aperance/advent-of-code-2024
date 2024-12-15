@@ -3,11 +3,11 @@ package main
 import (
 	"fmt"
 
-	"github.com/aperance/advent-of-code-2024/go/pkg/stdin"
+	"github.com/aperance/advent-of-code-2024/go/pkg/utils"
 )
 
 func main() {
-	scanner := stdin.GetScanner()
+	scanner := utils.GetScanner()
 
 	var input []string
 	for scanner.Scan() {

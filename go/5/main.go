@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/aperance/advent-of-code-2024/go/pkg/stdin"
+	"github.com/aperance/advent-of-code-2024/go/pkg/utils"
 )
 
 func checkUpdates(pages []string, ruleMap map[string][]string) bool {
@@ -29,7 +29,7 @@ func main() {
 	sum := 0
 	correctedSum := 0
 
-	scanner := stdin.GetScanner()
+	scanner := utils.GetScanner()
 	for scanner.Scan() {
 		line := scanner.Text()
 		if line == "" {

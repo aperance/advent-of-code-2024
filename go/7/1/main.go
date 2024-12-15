@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/aperance/advent-of-code-2024/go/pkg/stdin"
+	"github.com/aperance/advent-of-code-2024/go/pkg/utils"
 )
 
 func checkEquation(operands []int, result int) bool {
@@ -39,7 +39,7 @@ func checkEquation(operands []int, result int) bool {
 func main() {
 	sum := 0
 
-	scanner := stdin.GetScanner()
+	scanner := utils.GetScanner()
 	for scanner.Scan() {
 		row := strings.Split(scanner.Text(), ": ")
 
