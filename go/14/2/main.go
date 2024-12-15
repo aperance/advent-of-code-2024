@@ -79,7 +79,7 @@ func filledGrid() [height][width]string {
 	grid := [height][width]string{}
 
 	for i, row := range grid {
-		for j, _ := range row {
+		for j := range row {
 			grid[i][j] = " "
 		}
 	}
@@ -88,7 +88,6 @@ func filledGrid() [height][width]string {
 }
 
 func main() {
-
 	scanner := stdin.GetScanner()
 	var bots []robot
 	for scanner.Scan() {
