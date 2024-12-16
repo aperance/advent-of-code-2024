@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/aperance/advent-of-code-2024/go/pkg/utils"
 )
@@ -25,18 +26,16 @@ func (w *warehouse) appendRow(row string) {
 
 func (w *warehouse) moveRobot(xVec int, yVec int) {
 	neighbor := w.floorPlan[w.robotY+yVec][w.robotX+xVec]
-	switch neighbor {
-	case '#': // Wall
+
+	if neighbor == '#' {
 		return
-	case 'O': // Other box
+	}
+
+	if neighbor == 'O' {
 		result := w.moveBox(w.robotX+xVec, w.robotY+yVec, xVec, yVec)
 		if !result {
 			return
 		}
-	case '.': // Empty
-		break
-	default:
-		panic("Unexpected rune found")
 	}
 
 	w.floorPlan[w.robotY][w.robotX] = '.'
@@ -47,23 +46,22 @@ func (w *warehouse) moveRobot(xVec int, yVec int) {
 
 func (w *warehouse) moveBox(xPos int, yPos int, xVec int, yVec int) bool {
 	neighbor := w.floorPlan[yPos+yVec][xPos+xVec]
-	switch neighbor {
-	case '#': // Wall
+
+	if neighbor == '#' {
 		return false
-	case 'O': // Other box
-		result := w.moveBox(xPos+xVec, yPos+yVec, xVec, yVec)
-		if result {
-			w.floorPlan[yPos][xPos] = '.'
-			w.floorPlan[yPos+yVec][xPos+xVec] = 'O'
-		}
-		return result
-	case '.': // Empty
-		w.floorPlan[yPos][xPos] = '.'
-		w.floorPlan[yPos+yVec][xPos+xVec] = 'O'
-		return true
-	default:
-		panic("Unexpected rune found")
 	}
+
+	if neighbor == 'O' {
+		result := w.moveBox(xPos+xVec, yPos+yVec, xVec, yVec)
+		if !result {
+			return false
+		}
+	}
+
+	w.floorPlan[yPos][xPos] = '.'
+	w.floorPlan[yPos+yVec][xPos+xVec] = 'O'
+
+	return true
 }
 
 func (w *warehouse) printFloorPlan() {
@@ -111,7 +109,9 @@ func main() {
 
 	if animate {
 		fmt.Print("\033[2J\033[?25l")
-		utils.SetCleanup(func() { fmt.Print("\033[0m\033[?25h\n") })
+		f := func() { fmt.Print("\033[0m\033[?25h\n") }
+		utils.SetCleanup(f)
+		defer f()
 	}
 
 	w := warehouse{}
@@ -143,6 +143,7 @@ func main() {
 
 				if animate {
 					w.printFloorPlan()
+					time.Sleep(time.Millisecond * 100)
 				}
 			}
 		}
