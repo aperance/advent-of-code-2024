@@ -6,6 +6,8 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"strconv"
+	"strings"
 	"syscall"
 	"time"
 )
@@ -43,4 +45,27 @@ func SetCleanup(f func()) {
 		f()
 		os.Exit(1)
 	}()
+}
+
+func EncodeMapKey(i int, j int) string {
+	return strconv.Itoa(i) + ":" + strconv.Itoa(j)
+}
+
+func DecodeMapKey(s string) (int, int) {
+	var x, y int
+	var err error
+
+	vals := strings.Split(s, ":")
+
+	x, err = strconv.Atoi(vals[0])
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	y, err = strconv.Atoi(vals[1])
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return x, y
 }
