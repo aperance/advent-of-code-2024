@@ -88,9 +88,7 @@ func (m *Maze) step() {
 
 	m.position = [2]int{x, y}
 
-	if !m.endReached() {
-		m.path[utils.EncodeMapKey(x, y)] = marker
-	}
+	m.path[utils.EncodeMapKey(x, y)] = marker
 
 	m.score++
 }
@@ -99,7 +97,6 @@ func (m *Maze) run(queue chan Maze, results chan Maze) {
 	var moves []int
 
 	if m.endReached() {
-		fmt.Println("End Reached")
 		results <- *m
 		return
 	}
@@ -107,7 +104,6 @@ func (m *Maze) run(queue chan Maze, results chan Maze) {
 	for i := -1; i <= 1; i++ {
 		loop, wall := m.checkNeighbor(i)
 		if loop {
-			fmt.Println("Loop Detected")
 			results <- *m
 			return
 		} else if !wall {
@@ -116,7 +112,6 @@ func (m *Maze) run(queue chan Maze, results chan Maze) {
 	}
 
 	if len(moves) == 0 {
-		fmt.Println("Dead End")
 		results <- *m
 		return
 	}
@@ -131,7 +126,6 @@ func (m *Maze) run(queue chan Maze, results chan Maze) {
 		m.minScore.mu.Unlock()
 
 		if ok && m.score > minScore {
-			fmt.Println("More efficient path already found")
 			results <- *m
 			return
 		}
@@ -157,34 +151,37 @@ func main() {
 
 	minScore := minScore{data: map[string]int{}}
 	maze := Maze{path: map[string]rune{}, minScore: &minScore}
+
 	scanner := utils.GetScanner()
 	for scanner.Scan() {
 		row := scanner.Text()
 		for i, r := range row {
 			if r == 'S' {
 				maze.position = [2]int{i, len(maze._map)}
+				maze.path[utils.EncodeMapKey(i, len(maze._map))] = '>'
 			}
 		}
 		maze._map = append(maze._map, []rune(scanner.Text()))
 	}
 
 	lowestScore := 0
+	resultMap := make(map[int]map[string]struct{})
 	queue := make(chan Maze)
 	results := make(chan Maze)
 
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		maze.run(queue, results)
-	}()
+	spawn := func(m *Maze) {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			m.run(queue, results)
+		}()
+	}
+
+	spawn(&maze)
 
 	go func() {
 		for m := range queue {
-			wg.Add(1)
-			go func() {
-				defer wg.Done()
-				m.run(queue, results)
-			}()
+			spawn(&m)
 		}
 	}()
 
@@ -192,40 +189,23 @@ func main() {
 		for m := range results {
 			wg.Add(1)
 			if m.endReached() {
-				fmt.Println("Successful Path")
+				fmt.Printf("Successful path found! (score: %v)\n", m.score)
 				if lowestScore == 0 || lowestScore > m.score {
 					lowestScore = m.score
 				}
-			} else {
-				fmt.Println("Failed Path")
+				if _, ok := resultMap[m.score]; !ok {
+					resultMap[m.score] = make(map[string]struct{})
+				}
+				for key := range m.path {
+					resultMap[m.score][key] = struct{}{}
+				}
 			}
-			fmt.Println("Score:", m.score)
-			fmt.Print("\n")
 			wg.Done()
 		}
 	}()
 
 	wg.Wait()
 
-	fmt.Println("Lowest Score:", lowestScore)
+	fmt.Println("Lowest score:", lowestScore)
+	fmt.Println("Best path tile count:", len(resultMap[lowestScore]))
 }
-
-// func (m *Maze) print() {
-// 	for y := 0; y < len(m._map); y++ {
-// 		for x := 0; x < len(m._map[y]); x++ {
-// 			key := utils.EncodeMapKey(x, y)
-// 			if value, ok := m.path[key]; ok {
-// 				fmt.Print(string(value))
-// 			} else {
-// 				rune := m._map[y][x]
-// 				if rune == '.' {
-// 					fmt.Print(" ")
-// 				} else {
-// 					fmt.Print(string(rune))
-// 				}
-
-// 			}
-// 		}
-// 		fmt.Print("\n")
-// 	}
-// }
