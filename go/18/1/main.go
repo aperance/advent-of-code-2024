@@ -25,17 +25,17 @@ type memorySpace struct {
 }
 
 func (s *memorySpace) print() {
-	fmt.Print("\033[H\n")
+	fmt.Print("\033[H")
 	for y := 0; y < size; y++ {
 		for x := 0; x < size; x++ {
 			c := s.cells[x][y]
 			if c.visited {
-				fmt.Print("\033[48;5;" + strconv.Itoa(c.distance%6+1) + "m\033[30m")
-				fmt.Print(" " + strconv.Itoa(c.distance%10) + " ")
+				fmt.Printf("\033[10%vm", strconv.Itoa(c.distance%6+1))
+				fmt.Printf("\033[30m %v ", strconv.Itoa(c.distance%10))
 			} else if c.corrupt {
-				fmt.Print("\033[48;5;0m   ")
+				fmt.Print("\033[40m   ")
 			} else {
-				fmt.Print("\033[48;5;7m   ")
+				fmt.Print("\033[107m   ")
 			}
 			fmt.Print("\033[0m")
 		}
