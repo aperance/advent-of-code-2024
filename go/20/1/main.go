@@ -9,20 +9,37 @@ import (
 	"github.com/aperance/advent-of-code-2024/go/pkg/utils"
 )
 
+type queue struct {
+	data [][2]int
+}
+
+func (q *queue) pop() [2]int {
+	if len(q.data) == 0 {
+		log.Fatal("Queue empty!")
+	}
+
+	result := q.data[0]
+	q.data = q.data[1:]
+	return result
+}
+
+func (q *queue) push(el [2]int) {
+	q.data = append(q.data, el)
+}
+
 type cell struct {
 	blocked  bool
-	end      bool
 	visited  bool
 	distance int
 }
 
 type race struct {
 	cells [][]cell
-	queue [][2]int
+	start [2]int
+	end   [2]int
 }
 
 func (r *race) print() {
-	// fmt.Print("\033[H")
 	for y := 0; y < len(r.cells); y++ {
 		for x := 0; x < len(r.cells[0]); x++ {
 			c := r.cells[y][x]
@@ -41,33 +58,35 @@ func (r *race) print() {
 	fmt.Print("\n")
 }
 
-func (r *race) findPath() {
+func (r *race) getNeighbors(loc [2]int) [][2]int {
+	var result [][2]int
 	vectors := [4][2]int{{0, 1}, {1, 0}, {0, -1}, {-1, 0}}
 
-	for {
-		if len(r.queue) == 0 {
-			log.Fatal("Queue empty!")
+	for _, vector := range vectors {
+		x := loc[0] + vector[0]
+		y := loc[1] + vector[1]
+
+		if x < 0 || x >= len(r.cells[0]) || y < 0 || y >= len(r.cells) {
+			continue
 		}
+		result = append(result, [2]int{x, y})
+	}
 
-		ancestor := r.queue[0]
-		r.queue = r.queue[1:]
+	return result
+}
 
+func (r *race) findPath() {
+	var queue queue
+
+	queue.push(r.start)
+
+	for {
+		ancestor := queue.pop()
 		ancestorCell := &r.cells[ancestor[1]][ancestor[0]]
 
-		if ancestorCell.end {
-			fmt.Println(ancestorCell)
-			return
-		}
+		for _, loc := range r.getNeighbors(ancestor) {
+			cell := &r.cells[loc[1]][loc[0]]
 
-		for _, vector := range vectors {
-			x := ancestor[0] + vector[0]
-			y := ancestor[1] + vector[1]
-
-			if x < 0 || x >= len(r.cells[0]) || y < 0 || y >= len(r.cells) {
-				continue
-			}
-
-			cell := &r.cells[y][x]
 			if cell.blocked || cell.visited {
 				continue
 			}
@@ -75,12 +94,16 @@ func (r *race) findPath() {
 			cell.visited = true
 			cell.distance = ancestorCell.distance + 1
 
-			r.queue = append(r.queue, [2]int{x, y})
+			if loc == r.end {
+				return
+			}
+
+			queue.push(loc)
 		}
 	}
 }
 
-func (r *race) findCheats() int {
+func (r *race) findCheats() {
 	count := 0
 
 	for y := 1; y < len(r.cells)-1; y++ {
@@ -110,7 +133,7 @@ func (r *race) findCheats() int {
 		}
 	}
 
-	return count
+	fmt.Println("Cheats of over 100 picoseconds:", count)
 }
 
 func main() {
@@ -122,15 +145,14 @@ func main() {
 	scanner := utils.GetScanner()
 	for scanner.Scan() {
 		var row []cell
-		for i, char := range scanner.Text() {
-			row = append(row, cell{
-				blocked: char == '#',
-				end:     char == 'E',
-				visited: char == 'S',
-			})
+		for x, char := range scanner.Text() {
+			y := len(race.cells)
 			if char == 'S' {
-				race.queue = append(race.queue, [2]int{i, len(race.cells)})
+				race.start = [2]int{x, y}
+			} else if char == 'E' {
+				race.end = [2]int{x, y}
 			}
+			row = append(row, cell{blocked: char == '#', visited: char == 'S'})
 		}
 		race.cells = append(race.cells, row)
 	}
@@ -138,6 +160,5 @@ func main() {
 	race.print()
 	race.findPath()
 	race.print()
-	result := race.findCheats()
-	fmt.Println("Cheats of over 100 picoseconds:", result)
+	race.findCheats()
 }
